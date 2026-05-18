@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certifymanz</title>
+    <link rel="icon" href="https://i.ibb.co.com/j94P09Sb/Chat-GPT-Image-10-Mei-2026-21-40-08-removebg-preview.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col selection:bg-indigo-200 selection:text-indigo-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md py-4 px-6 flex justify-between items-center sticky top-0 z-50 transition-all duration-300">
+        <a href="#sertifikat" class="flex items-center gap-3 transform hover:scale-105 transition duration-300">
+            <img src="https://i.ibb.co.com/j94P09Sb/Chat-GPT-Image-10-Mei-2026-21-40-08-removebg-preview.png" alt="Certifymanz Logo" class="h-10 w-10 object-contain drop-shadow-md">
+            <span class="text-2xl font-bold text-indigo-600 tracking-tight">Certifymanz</span>
+        </a>
+        <div class="flex gap-4 items-center overflow-x-auto hide-scrollbar">
+            <a href="#sertifikat" class="text-gray-600 hover:text-indigo-600 font-medium transition-colors duration-300">Sertifikat</a>
+            <a href="#pengumuman" class="text-gray-600 hover:text-indigo-600 font-medium transition-colors duration-300">Pengumuman</a>
+            <a href="#admin" id="admin-link" class="text-gray-600 hover:text-indigo-600 font-medium hidden transition-colors duration-300">Dasbor</a>
+            <button id="logout-btn" class="hidden bg-red-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-600 transform hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg">Keluar</button>
+        </div>
+    </nav>
+
+    <!-- Modal for Image Viewing -->
+    <div id="image-modal" class="hidden fixed inset-0 z-[100] bg-black bg-opacity-80 flex justify-center items-center p-4 transition-opacity duration-300">
+        <span class="absolute top-5 right-5 text-white text-4xl cursor-pointer hover:text-gray-300 transition-colors" onclick="closeModal()">&times;</span>
+        <img id="modal-img" class="max-w-full max-h-full rounded-lg shadow-2xl" src="" alt="Dokumen">
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow p-6 md:p-12 w-full max-w-7xl mx-auto">
+        
+        <!-- Sertifikat View (Public) -->
+        <div id="sertifikat-view" class="hidden flex flex-col items-center animate-fade-in">
+            <div class="w-full max-w-2xl mb-10 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 tracking-tight">Penyimpanan Sertifikat</h1>
+                <p class="text-gray-600 mb-8 text-lg">Cari dan lihat sertifikat yang diunggah dengan aman.</p>
+                <div class="relative transform hover:scale-[1.02] transition duration-300">
+                    <input type="text" id="search-sertifikat" placeholder="Cari berdasarkan nama file..." class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 text-lg transition-all duration-300">
+                    <svg class="w-6 h-6 text-gray-400 absolute right-6 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+            <div id="sertifikat-container" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Documents will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Pengumuman View (Public) -->
+        <div id="pengumuman-view" class="hidden flex flex-col items-center animate-fade-in">
+            <div class="w-full max-w-2xl mb-10 text-center">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 tracking-tight">Pengumuman</h1>
+                <p class="text-gray-600 mb-8 text-lg">Lihat pengumuman nilai</p>
+                <div class="relative transform hover:scale-[1.02] transition duration-300">
+                    <input type="text" id="search-pengumuman" placeholder="Cari pengumuman..." class="w-full px-6 py-4 border border-gray-300 rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 text-lg transition-all duration-300">
+                    <svg class="w-6 h-6 text-gray-400 absolute right-6 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+            <div id="pengumuman-container" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Announcements will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Admin Login View -->
+        <div id="admin-login-view" class="hidden flex justify-center items-center h-full mt-10 animate-fade-in">
+            <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md border border-gray-100 transform transition-all">
+                <div class="flex justify-center mb-6">
+                    <img src="https://i.ibb.co.com/j94P09Sb/Chat-GPT-Image-10-Mei-2026-21-40-08-removebg-preview.png" alt="Logo" class="h-20 w-20 drop-shadow-md animate-bounce" style="animation-duration: 3s;">
+                </div>
+                <h2 class="text-3xl font-extrabold text-center mb-8 text-gray-800">Portal Admin</h2>
+                <form id="login-form" class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+                        <input type="email" id="email" required class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Kata Sandi</label>
+                        <input type="password" id="password" required class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none transition-all">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold text-lg hover:bg-indigo-700 transform hover:-translate-y-1 hover:shadow-xl transition-all duration-300">Masuk</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard View -->
+        <div id="admin-dashboard-view" class="hidden animate-fade-in">
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-8 tracking-tight">Dasbor Admin</h2>
+            
+            <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 mb-12 transform hover:shadow-xl transition-shadow duration-300">
+                <h3 class="text-2xl font-bold mb-6 text-indigo-900">Tambah Dokumen Baru (Tautan ImgBB)</h3>
+                <form id="upload-form" class="flex flex-col gap-5">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Dokumen</label>
+                            <input type="text" id="doc-name" placeholder="Contoh: Sertifikat John Doe" required class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Kategori</label>
+                            <select id="doc-category" required class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none transition-all bg-white">
+                                <option value="sertifikat">Sertifikat</option>
+                                <option value="pengumuman">Pengumuman</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Tautan Langsung ImgBB (PNG/JPG)</label>
+                            <input type="url" id="imgbb-link" placeholder="https://i.ibb.co/.../image.png" required class="w-full px-5 py-3 border border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                    </div>
+                    <button type="submit" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transform hover:-translate-y-1 hover:shadow-lg transition-all duration-300 self-start">Simpan Dokumen</button>
+                </form>
+                <div id="upload-progress" class="mt-5 text-sm font-bold text-indigo-600 transition-all duration-300"></div>
+            </div>
+
+            <h3 class="text-3xl font-bold text-gray-800 mb-6">Kelola Dokumen</h3>
+            <div id="admin-docs-container" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Admin documents will be rendered here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Firebase SDK & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBElzImRbBR3yt-0YfpmBAR-trW8l7s3pQ",
+            authDomain: "certifymanz.firebaseapp.com",
+            projectId: "certifymanz",
+            storageBucket: "certifymanz.firebasestorage.app",
+            messagingSenderId: "870543683715",
+            appId: "1:870543683715:web:c34d0d7f624db5e52eabb6",
+            measurementId: "G-0R61W5WH5S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let allDocs = [];
+
+        // Helper to generate consistent slugs
+        const getSlug = (name) => encodeURIComponent(name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+
+        // Make global functions for inline HTML event handlers
+        window.openModal = function(url, slug) {
+            document.getElementById('modal-img').src = url;
+            document.getElementById('image-modal').classList.remove('hidden');
+            
+            if (slug) {
+                const baseHash = window.location.hash.split('/')[0] || '#sertifikat';
+                window.history.pushState(null, '', `${baseHash}/${slug}`);
+            }
+        };
+
+        window.closeModal = function() {
+            document.getElementById('image-modal').classList.add('hidden');
+            document.getElementById('modal-img').src = '';
+            
+            const baseHash = window.location.hash.split('/')[0] || '#sertifikat';
+            window.history.pushState(null, '', baseHash);
+        };
+
+        window.deleteDocument = async function(id) {
+            if(confirm("Apakah Anda yakin ingin menghapus dokumen ini?")) {
+                try {
+                    await deleteDoc(doc(db, "documents", id));
+                    alert("Dokumen berhasil dihapus.");
+                    forceReloadDocs();
+                } catch(e) {
+                    alert("Gagal menghapus dokumen: " + e.message);
+                }
+            }
+        };
+
+        // UI Elements
+        const views = {
+            sertifikat: document.getElementById('sertifikat-view'),
+            pengumuman: document.getElementById('pengumuman-view'),
+            login: document.getElementById('admin-login-view'),
+            dashboard: document.getElementById('admin-dashboard-view')
+        };
+        const logoutBtn = document.getElementById('logout-btn');
+        const adminLink = document.getElementById('admin-link');
+
+        // Router
+        async function handleRoute() {
+            const hash = window.location.hash || '#sertifikat';
+            const hashParts = hash.split('/');
+            const baseHash = hashParts[0];
+            const slug = hashParts[1];
+
+            // Close modal if there's no slug in the URL (e.g. user clicked Back)
+            if (!slug) {
+                document.getElementById('image-modal').classList.add('hidden');
+                document.getElementById('modal-img').src = '';
+            }
+
+            Object.values(views).forEach(view => {
+                if (view) view.classList.add('hidden');
+            });
+
+            const viewKey = baseHash.replace('#', '');
+            const currentView = views[viewKey] || views.sertifikat;
+
+            if (baseHash === '#admin') {
+                if (currentUser) {
+                    views.dashboard.classList.remove('hidden');
+                    await loadAdminDocuments();
+                } else {
+                    views.login.classList.remove('hidden');
+                }
+            } else {
+                currentView.classList.remove('hidden');
+                if(baseHash === '#sertifikat' || baseHash === '') await loadPublicDocuments('sertifikat');
+                if(baseHash === '#pengumuman') await loadPublicDocuments('pengumuman');
+            }
+
+            // Open modal if there is a slug
+            if (slug && allDocs.length > 0) {
+                const docToOpen = allDocs.find(d => getSlug(d.name) === slug);
+                if (docToOpen) {
+                    document.getElementById('modal-img').src = docToOpen.url;
+                    document.getElementById('image-modal').classList.remove('hidden');
+                }
+            }
+        }
+
+        window.addEventListener('hashchange', handleRoute);
+
+        // Auth Listener
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                logoutBtn.classList.remove('hidden');
+                adminLink.classList.remove('hidden');
+            } else {
+                logoutBtn.classList.add('hidden');
+                adminLink.classList.add('hidden');
+            }
+            handleRoute();
+        });
+
+        // Login
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.hash = '#admin';
+            } catch (err) {
+                alert("Login gagal: " + err.message);
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+            window.location.hash = '#sertifikat';
+        });
+
+        // Upload (Save ImgBB Link)
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('doc-name');
+            const categoryInput = document.getElementById('doc-category');
+            const linkInput = document.getElementById('imgbb-link');
+            const progressEl = document.getElementById('upload-progress');
+            
+            const name = nameInput.value.trim();
+            const category = categoryInput.value;
+            const url = linkInput.value.trim();
+
+            const isImage = /\.(jpeg|jpg|png)$/i.test(url);
+            const isImgBB = url.includes('ibb.co');
+
+            if (!isImage && !isImgBB) {
+                progressEl.innerText = 'Error: Harap berikan URL ImgBB yang valid atau tautan langsung gambar (.png, .jpg, .jpeg)';
+                progressEl.classList.remove('text-indigo-600');
+                progressEl.classList.add('text-red-500');
+                return;
+            }
+
+            progressEl.classList.remove('text-red-500');
+            progressEl.classList.add('text-indigo-600');
+            progressEl.innerText = 'Menyimpan dokumen secara aman...';
+
+            try {
+                const now = new Date();
+                await addDoc(collection(db, "documents"), {
+                    name: name,
+                    category: category,
+                    url: url,
+                    type: 'image/jpeg',
+                    date: now.toLocaleDateString('id-ID'),
+                    time: now.toLocaleTimeString('id-ID'),
+                    year: now.getFullYear().toString(),
+                    timestamp: now.getTime()
+                });
+                
+                progressEl.innerText = 'Dokumen berhasil disimpan!';
+                nameInput.value = '';
+                linkInput.value = '';
+                setTimeout(() => progressEl.innerText = '', 3000);
+                forceReloadDocs();
+            } catch (error) {
+                console.error(error);
+                progressEl.innerText = 'Gagal menyimpan dokumen. Silakan coba lagi.';
+                progressEl.classList.remove('text-indigo-600');
+                progressEl.classList.add('text-red-500');
+            }
+        });
+
+        // Fetch & Render Docs
+        async function fetchDocs() {
+            try {
+                const q = query(collection(db, "documents"), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                allDocs = [];
+                querySnapshot.forEach((doc) => {
+                    allDocs.push({ id: doc.id, ...doc.data() });
+                });
+            } catch (e) {
+                console.error("Error fetching documents: ", e);
+            }
+        }
+
+        async function forceReloadDocs() {
+            await fetchDocs();
+            handleRoute();
+        }
+
+        function renderDocs(docs, containerId, isAdmin = false) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            
+            if (docs.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 col-span-full text-center py-12 text-lg font-medium">Tidak ada dokumen ditemukan.</p>';
+                return;
+            }
+
+            docs.forEach((doc, index) => {
+                const delayClass = `stagger-${(index % 3) + 1}`;
+                const div = document.createElement('div');
+                div.className = `bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex flex-col transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 animate-fade-in ${delayClass}`;
+                
+                // For admin view, add delete button
+                const adminActions = isAdmin ? `
+                    <button onclick="deleteDocument('${doc.id}')" class="mt-3 block w-full text-center bg-red-50 text-red-600 border border-red-200 py-2 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all duration-300 shadow-sm">Hapus Dokumen</button>
+                ` : '';
+
+                const slug = getSlug(doc.name);
+
+                div.innerHTML = `
+                    <div class="flex items-center justify-center h-48 bg-gray-100 rounded-xl mb-5 overflow-hidden border border-gray-200 group relative cursor-pointer" onclick="openModal('${doc.url}', '${slug}')">
+                        <img src="${doc.url}" alt="${doc.name}" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500" onerror="this.src='https://via.placeholder.com/400x300?text=Gambar+Tidak+Ditemukan'">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                            <span class="text-white opacity-0 group-hover:opacity-100 font-semibold drop-shadow-md">Klik untuk memperbesar</span>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <span class="inline-block px-2 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-md mb-2 uppercase">${doc.category || 'Dokumen'}</span>
+                        <h3 class="text-lg font-bold text-gray-800 break-all line-clamp-2" title="${doc.name}">${doc.name}</h3>
+                        <div class="mt-4 space-y-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                            <p class="text-sm text-gray-600 flex justify-between"><span class="font-semibold text-gray-700">Tanggal:</span> <span>${doc.date}</span></p>
+                            <p class="text-sm text-gray-600 flex justify-between"><span class="font-semibold text-gray-700">Tahun:</span> <span>${doc.year || '-'}</span></p>
+                            <p class="text-sm text-gray-600 flex justify-between"><span class="font-semibold text-gray-700">Waktu:</span> <span>${doc.time}</span></p>
+                        </div>
+                    </div>
+                    <button onclick="openModal('${doc.url}', '${slug}')" class="mt-6 block w-full text-center bg-indigo-50 text-indigo-700 border border-indigo-200 py-3 rounded-xl font-bold hover:bg-indigo-600 hover:text-white transform hover:scale-105 transition-all duration-300 shadow-sm hover:shadow-md">Lihat Dokumen</button>
+                    ${adminActions}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        async function loadPublicDocuments(category) {
+            if (allDocs.length === 0) await fetchDocs();
+            const filtered = allDocs.filter(d => d.category === category || (!d.category && category === 'sertifikat'));
+            renderDocs(filtered, `${category}-container`);
+        }
+
+        async function loadAdminDocuments() {
+            if (allDocs.length === 0) await fetchDocs();
+            renderDocs(allDocs, 'admin-docs-container', true);
+        }
+
+        // Search logic
+        document.getElementById('search-sertifikat').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allDocs.filter(d => (d.category === 'sertifikat' || !d.category) && d.name.toLowerCase().includes(term));
+            renderDocs(filtered, 'sertifikat-container');
+        });
+
+        document.getElementById('search-pengumuman').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allDocs.filter(d => d.category === 'pengumuman' && d.name.toLowerCase().includes(term));
+            renderDocs(filtered, 'pengumuman-container');
+        });
+
+        // Init
+        if(!window.location.hash) window.location.hash = '#sertifikat';
+        handleRoute();
+    </script>
+</body>
+</html>
